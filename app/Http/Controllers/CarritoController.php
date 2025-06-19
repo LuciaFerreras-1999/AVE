@@ -34,7 +34,6 @@ class CarritoController extends Controller
         $carrito = session()->get('carrito', collect());
 
         if (auth()->check()) {
-            // Impide que el usuario agregue su propia prenda
             if ($prenda->user_id === auth()->id()) {
                 return response()->json(['error' => 'No puedes agregar tus propias prendas al carrito.'], 403);
             }
@@ -92,7 +91,6 @@ class CarritoController extends Controller
     {
         $carrito = session()->get('carrito', collect());
 
-        // Elimina prendas vendidas
         $carrito = $carrito->filter(fn($prenda) => !$prenda->vendido);
 
         session()->put('carrito', $carrito);
