@@ -1,0 +1,268 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg: #ecfffb;
+  --color-sidebar: #264653;
+  --color-accent: #f4a261;
+  --color-accent-hover: #e76f51;
+  --color-text: #1e1e1e;
+  --color-highlight: #cfc194;
+}
+
+body {
+  font-family: 'Quicksand', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.sidebar {
+  background-color: var(--color-sidebar);
+  color: white;
+  min-height: 100vh;
+  width: 220px;
+  padding: 1.5rem 1rem;
+  position: fixed;
+}
+
+.sidebar a {
+  color: white;
+  display: block;
+  margin: 1rem 0;
+  padding: 0.5rem 0.75rem;
+  text-decoration: none;
+  border-radius: 0.375rem;
+  transition: all 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: var(--color-accent);
+  color: white;
+  padding-left: 10px;
+}
+
+.main-content {
+  margin-left: 220px;
+  padding: 2rem;
+}
+
+.header {
+  background-color: var(--color-bg);
+  color: var(--color-sidebar);
+  padding: 1.5rem;
+  text-align: center;
+  font-family: 'Quicksand', sans-serif;
+  border-bottom: 2px solid var(--color-highlight);
+}
+
+.btn-accent {
+  background-color: var(--color-accent);
+  color: white;
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-accent:hover {
+  background-color: var(--color-accent-hover) !important;
+  color: white !important;
+}
+
+
+.card-img-top {
+  height: 15rem;
+  width: 100%;
+  object-fit: contain;
+  background-color: white;
+  padding: 0.5rem;
+}
+
+.perfil-link:hover {
+  background-color: var(--color-accent);
+  border-radius: 4px;
+}
+
+.sidebar a.no-sidebar-hover:hover {
+  background-color: transparent !important;
+  color: inherit !important;
+  padding-left: 0 !important;
+}
+
+html, body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 220px;
+  padding: 2rem;
+}
+
+footer {
+  margin-left: 220px;
+  background-color: var(--color-sidebar);
+  color: var(--color-bg);
+  padding: 2rem 1.5rem;
+}
+
+
+.grid-checks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem 1rem;
+  width: 100%;
+}
+
+.grid-checks label {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.grid-checks label:hover {
+  background-color: #f3f3f3;
+}
+
+.grid-checks input[type="checkbox"] {
+  accent-color: var(--color-accent);
+  margin-right: 0.5rem;
+  flex-shrink: 0;
+}
+.grid-checks input[type="checkbox"]:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.5);
+  border-radius: 4px;
+}
+
+.sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 3px;
+  transition: background-color 0.3s ease;
+}
+
+.sidebar:hover {
+  scrollbar-color: rgba(255,255,255,0.4) rgba(0,0,0,0.1);
+}
+
+.sidebar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+.sidebar:hover::-webkit-scrollbar {
+  background-color: rgba(0,0,0,0.1);
+}
+.btn-reportar {
+    background-color: var(--color-accent-hover);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-reportar:hover {
+    background-color: #d65a3f;
+}
+
+.btn-edit {
+  background-color: var(--color-sidebar);
+  color: white;
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 0.25rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-edit:hover {
+  background-color: #1f3d4a;
+  color: white;
+}
+
+.heart-toggle:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.like-count {
+    display: inline-block;
+    width: 2.5em;
+    text-align: left;
+}
+
+.carrito-toggle svg .carrito-tachado {
+  display: none;
+  stroke: red;
+  stroke-width: 2;
+}
+
+.carrito-toggle[data-agregado="1"] svg .carrito-tachado {
+  display: inline;
+}
+
+.input-mensaje {
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-shadow: none;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.input-mensaje:focus {
+  border-color: #6c63ff;
+  box-shadow: 0 0 5px rgba(108, 99, 255, 0.5);
+}
+
+.btn-view {
+  background-color: #cfc194;
+  color: #000;
+  border: none;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.25rem;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-view:hover {
+  background-color: #b8ac7a;
+  color: #000;
+  text-decoration: none;
+}
+
+#footer {
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+
+@media (max-width: 768px) {
+  #footer {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+}
