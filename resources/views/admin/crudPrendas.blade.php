@@ -168,6 +168,12 @@
                     name: "action",
                     orderable: false,
                     searchable: false,
+                    render: function(data, type, row) {
+                        return `
+                <button class="btn btn-edit edit" data-id="${row.id}">Editar</button>
+                <button class="btn btn-danger delete" data-id="${row.id}">Eliminar</button>
+            `;
+                    },
                 },
             ],
         });

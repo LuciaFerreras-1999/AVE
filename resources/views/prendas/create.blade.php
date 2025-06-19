@@ -31,8 +31,31 @@
 
         <div class="mb-3">
             <label for="talla" class="form-label">Talla</label>
-            <input type="text" class="form-control" id="talla" name="talla" value="{{ old('talla') }}">
+            <select name="talla" id="talla" class="form-select @error('talla') is-invalid @enderror">
+                <optgroup label="Tallas con letras">
+                    @foreach($tallas as $talla)
+                    @if(!is_numeric($talla))
+                    <option value="{{ $talla }}" {{ old('talla', $prenda->talla ?? '') == $talla ? 'selected' : '' }}>
+                        {{ $talla }}
+                    </option>
+                    @endif
+                    @endforeach
+                </optgroup>
+                <optgroup label="Tallas numéricas">
+                    @foreach($tallas as $talla)
+                    @if(is_numeric($talla))
+                    <option value="{{ $talla }}" {{ old('talla', $prenda->talla ?? '') == $talla ? 'selected' : '' }}>
+                        {{ $talla }}
+                    </option>
+                    @endif
+                    @endforeach
+                </optgroup>
+            </select>
+            @error('talla')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
+
 
         <div class="mb-3">
             <label for="marca" class="form-label">Marca</label>
@@ -69,7 +92,7 @@
                 @endforeach
             </div>
         </div>
-        
+
         <div class="mb-3">
             <label for="imagen" class="form-label">Imagen</label>
             <input type="file" class="form-control" id="imagen" name="imagen" required>

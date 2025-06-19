@@ -50,7 +50,7 @@
         <tr>
             <td>{{ $reporte->usuarioReporta->name ?? 'Usuario eliminado' }}</td>
             <td>
-                <a href="{{ route('prendas.mercado.show', ['usuario' => $reporte->prenda->user->name, 'prenda' => $reporte->prenda->slug]) }}" target="_blank">
+                <a href="{{ route('prendas.mercado.show', ['usuario' => $reporte->prenda->user->name, 'prenda' => $reporte->prenda->slug]) }}">
                     {{ $reporte->prenda->nombre }}
                 </a>
             </td>

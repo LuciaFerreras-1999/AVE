@@ -16,6 +16,7 @@ class PrendaController extends Controller
     public function bienvenida()
     {
         $prendas = Prenda::where('publicada', true)
+            ->where('vendido', false)
             ->with('imagenes')
             ->latest()
             ->take(5)
@@ -29,7 +30,13 @@ class PrendaController extends Controller
     {
         $estados = ['nuevo', 'usado'];
         $tallas = Prenda::TALLAS;
-        $marcas = Prenda::distinct()->pluck('marca')->toArray();
+        $marcas = Prenda::where('user_id', Auth::id())
+            ->whereNotNull('marca')
+            ->where('marca', '!=', '')
+            ->distinct()
+            ->pluck('marca')
+            ->toArray();
+
         $categorias = Categoria::orderBy('nombre')->get();
 
         $query = Prenda::where('user_id', Auth::id())
@@ -97,6 +104,7 @@ class PrendaController extends Controller
     public function create()
     {
         $categorias = Categoria::orderBy('nombre')->get();
+        $tallas = Prenda::TALLAS;
 
         $breadcrumb = [
             ['label' => 'Inicio', 'url' => route('home')],
@@ -104,7 +112,7 @@ class PrendaController extends Controller
             ['label' => 'Crear prenda', 'url' => route('prendas.create')],
         ];
 
-        return view('prendas.create', compact('categorias', 'breadcrumb'));
+        return view('prendas.create', compact('categorias', 'tallas', 'breadcrumb'));
     }
 
     // Guarda una imagen en el sistema de archivos y elimina la anterior si existe
@@ -129,13 +137,13 @@ class PrendaController extends Controller
     }
 
     // Genera un slug único para la prenda basándose en su nombre y el usuario
-    private function generarSlugUnico($nombre, $userId)
+    private function generarSlugUnico($nombre)
     {
         $slugBase = Str::slug($nombre);
         $slug = $slugBase;
         $contador = 1;
 
-        while (Prenda::where('slug', $slug)->where('user_id', $userId)->exists()) {
+        while (Prenda::where('slug', $slug)->exists()) {
             $slug = $slugBase . '-' . $contador;
             $contador++;
         }
@@ -143,13 +151,14 @@ class PrendaController extends Controller
         return $slug;
     }
 
+
     // Guarda una nueva prenda en la base de datos
     public function store(PrendaRequest $request)
     {
         $prenda = new Prenda([
             'user_id' => Auth::id(),
             'nombre' => $request->nombre,
-            'slug' => $this->generarSlugUnico($request->nombre, Auth::id()),
+            'slug' => $this->generarSlugUnico($request->nombre),
             'descripcion' => $request->descripcion,
             'talla' => $request->talla,
             'marca' => $request->marca,
@@ -169,6 +178,7 @@ class PrendaController extends Controller
 
         return redirect()->route('prendas.index')->with('success', 'Prenda creada con éxito.');
     }
+
 
     // Muestra el formulario para editar una prenda
     public function edit(Prenda $prenda)
@@ -208,7 +218,7 @@ class PrendaController extends Controller
 
         if ($request->nombre !== $prenda->nombre) {
             $data['nombre'] = $request->nombre;
-            $data['slug'] = $this->generarSlugUnico($request->nombre, Auth::id());
+            $data['slug'] = $this->generarSlugUnico($request->nombre);
         }
 
         $prenda->update($data);
@@ -314,7 +324,12 @@ class PrendaController extends Controller
             'prendas' => $prendas,
             'estados' => Prenda::select('estado')->distinct()->pluck('estado'),
             'tallas' => Prenda::select('talla')->distinct()->pluck('talla'),
-            'marcas' => Prenda::select('marca')->distinct()->pluck('marca'),
+            'marcas' => Prenda::whereNotNull('marca')
+                ->where('marca', '!=', '')
+                ->select('marca')
+                ->distinct()
+                ->pluck('marca'),
+
             'categorias' => Categoria::all(),
             'breadcrumb' => $breadcrumb,
         ]);

@@ -11,7 +11,7 @@
     <li class="list-group-item d-flex justify-content-between align-items-center">
 
         <div class="d-flex align-items-center flex-grow-1">
-            <img src="{{ $user->avatar ? asset('storage/' . $user->avatar) : asset('assets/logo/default-avatar.png') }}"
+            <img src="{{ $user->avatar ? asset('assets/imagenes/' . $user->avatar) : asset('assets/logo/default-avatar.png') }}"
                 alt="{{ $user->name }}"
                 class="rounded-circle mr-3"
                 style="width: 40px; height: 40px; object-fit: cover;">

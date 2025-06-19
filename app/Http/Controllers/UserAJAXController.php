@@ -80,6 +80,7 @@ class UserAJAXController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $id,
             'bloqueado' => 'required|boolean',
+            'password' => 'nullable|string|min:8|confirmed',  // Contraseña opcional con confirmación
         ];
 
         $validatedData = $request->validate($rules);
@@ -89,7 +90,15 @@ class UserAJAXController extends Controller
 
             $wasBlocked = $usuario->bloqueado;
 
-            $usuario->update($validatedData);
+            $usuario->name = $validatedData['name'];
+            $usuario->email = $validatedData['email'];
+            $usuario->bloqueado = $validatedData['bloqueado'];
+
+            if (!empty($validatedData['password'])) {
+                $usuario->password = bcrypt($validatedData['password']);
+            }
+
+            $usuario->save();
 
             if ($wasBlocked && !$usuario->bloqueado) {
                 $usuario->strikes()->delete();

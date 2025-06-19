@@ -8,7 +8,7 @@
     @if($errors->any())
     <div class="alert alert-danger">
         <ul>
-            
+
             @foreach($errors->all() as $error)
             <li>{{ $error }}</li>
             @endforeach
@@ -40,12 +40,22 @@
         <div class="mb-3">
             <label for="talla" class="form-label">Talla</label>
             <select name="talla" id="talla" class="form-select @error('talla') is-invalid @enderror">
-
-                @foreach($tallas as $talla)
-                <option value="{{ $talla }}" {{ old('talla', $prenda->talla) == $talla ? 'selected' : '' }}>{{ $talla }}</option>
-                @endforeach
-
+                <optgroup label="Tallas con letras">
+                    @foreach($tallas as $talla)
+                    @if(!is_numeric($talla))
+                    <option value="{{ $talla }}" {{ old('talla', $prenda->talla) == $talla ? 'selected' : '' }}>{{ $talla }}</option>
+                    @endif
+                    @endforeach
+                </optgroup>
+                <optgroup label="Tallas numéricas">
+                    @foreach($tallas as $talla)
+                    @if(is_numeric($talla))
+                    <option value="{{ $talla }}" {{ old('talla', $prenda->talla) == $talla ? 'selected' : '' }}>{{ $talla }}</option>
+                    @endif
+                    @endforeach
+                </optgroup>                
             </select>
+
             @error('talla')
             <div class="invalid-feedback">{{ $message }}</div>
             @enderror

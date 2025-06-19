@@ -28,7 +28,7 @@ class StrikeController extends Controller
 
             $mensajeTexto = 'Has alcanzado el límite de 3 strikes. Tu cuenta ha sido bloqueada temporalmente.';
         } else {
-            $mensajeTexto = "Has recibido un strike por incumplimiento de normas. Te quedan {$strikesRestantes} strike(s) antes de la eliminación de tu cuenta.";
+            $mensajeTexto = "Has recibido un strike por incumplimiento de normas. Te quedan {$strikesRestantes} strike(s) antes del bloqueo de tu cuenta.";
         }
 
         MensajePrivado::create([

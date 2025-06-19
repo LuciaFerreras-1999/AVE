@@ -1,8 +1,10 @@
 @extends('layouts.plantilla')
 
-@section('contenido')
+@section('titulo', 'Inicio')
+
 @section('sinHeader', true)
 
+@section('contenido')
 <div class="relative h-[500px] bg-cover bg-center rounded-xl overflow-hidden shadow-lg mb-10"
     style="background-image: url('{{ asset('assets/logo/banner_ave.png') }}')">
 
@@ -32,7 +34,12 @@
 </div>
 
 <h2 class="text-2xl font-semibold mb-4">Prendas destacadas del mercado</h2>
-<div id="carouselExampleIndicators" class="carousel slide mb-8" data-ride="carousel" data-interval="3000">
+<div id="carouselExampleIndicators" class="carousel slide mb-8" data-bs-ride="carousel" data-bs-interval="3000">
+    <ol class="carousel-indicators">
+        @foreach ($prendas->chunk(3) as $index => $grupo)
+        <li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}"></li>
+        @endforeach
+    </ol>
     <div class="carousel-inner">
 
         @foreach ($prendas->chunk(3) as $index => $grupo)
@@ -63,13 +70,16 @@
         @endforeach
 
     </div>
-    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    </a>
-    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+        <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    </a>
+        <span class="visually-hidden">Siguiente</span>
+    </button>
 </div>
+
 
 <h2 class="text-2xl font-semibold mb-4">¿Por qué usar AVE?</h2>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">

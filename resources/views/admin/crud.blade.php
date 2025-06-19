@@ -42,6 +42,15 @@
                     <input type="email" name="email" id="email" class="form-control" required />
                 </div>
                 <div class="mb-3">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input type="password" name="password" id="password" class="form-control" placeholder="Cambiar">
+                </div>
+                <div class="mb-3">
+                    <label for="password_confirmation" class="form-label">Confirmar Contraseña</label>
+                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Confirma la nueva contraseña">
+                </div>
+
+                <div class="mb-3">
                     <label for="bloqueado" class="form-label">Bloqueado</label>
                     <select name="bloqueado" id="bloqueado" class="form-select">
                         <option value="0">No</option>
@@ -136,9 +145,12 @@
                 $("#name").val(data.name);
                 $("#email").val(data.email);
                 $("#bloqueado").val(data.bloqueado ? 1 : 0);
+                $("#password").val('');
+                $("#password_confirmation").val('');
                 $("#ajaxModal").modal("show");
             });
         });
+
 
         $("#formUsuario").submit(function(e) {
             e.preventDefault();

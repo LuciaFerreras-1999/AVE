@@ -24,7 +24,7 @@ class PrendaRequest extends FormRequest
         return [
             'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string|max:1000',
-            'talla' => 'string|max:5',
+            'talla' => 'required|string|max:5',
             'marca' => 'nullable|string|max:255',
             'estado' => 'required|in:nuevo,usado',
             'categorias' => 'required|array|min:1',

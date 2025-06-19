@@ -4,91 +4,96 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Prenda;
-use Illuminate\Support\Facades\DB;
 use App\Models\Compra;
+use App\Models\Carrito;
 
 class CarritoController extends Controller
 {
-    // Verifica que el usuario esté autenticado y añade una prenda al carrito en sesión, evitando agregar prendas propias.
-    public function agregar(Request $request)
+    /**
+     * Sincroniza el carrito desde la base de datos al iniciar sesión.
+     */
+    public function sincronizarDesdeBD()
     {
-        if (!auth()->check()) {
-            return response()->json(['error' => 'Debes iniciar sesión.'], 401);
-        }
-        try {
-            $prenda = Prenda::findOrFail($request->prenda_id);
-            $carrito = session()->get('carrito', collect());
+        if (auth()->check()) {
+            $prendas = Carrito::with('prenda')
+                ->where('user_id', auth()->id())
+                ->get()
+                ->pluck('prenda')
+                ->filter();
 
-            if ($prenda->user_id === auth()->id()) {
-                $mensaje = 'No puedes agregar tus propias prendas al carrito.';
-
-                return $request->ajax()
-                    ? response()->json(['error' => $mensaje], 403)
-                    : redirect()->back()->with('error', $mensaje);
-            }
-
-            if (!$carrito->contains('id', $prenda->id)) {
-                $carrito->push($prenda);
-                session(['carrito' => $carrito]);
-            }
-
-            $respuesta = [
-                'success' => true,
-                'message' => 'Prenda añadida al carrito.',
-                'carritoCount' => $carrito->count(),
-                'prendaId' => $prenda->id,
-            ];
-
-            return $request->ajax()
-                ? response()->json($respuesta)
-                : redirect()->back()->with('success', $respuesta['message']);
-
-        } catch (\Exception $e) {
-            if ($request->ajax()) {
-                return response()->json([
-                    'error' => 'Error al agregar la prenda al carrito.',
-                    'exception' => $e->getMessage(),
-                ], 500);
-            }
-
-            return redirect()->back()->with('error', 'Error al agregar la prenda al carrito.');
+            session(['carrito' => $prendas]);
         }
     }
 
-    // Elimina la prenda indicada del carrito guardado en sesión.
-    public function quitar(Request $request, Prenda $prenda)
+    /**
+     * Agrega una prenda al carrito, tanto en sesión como en base de datos si el usuario está autenticado.
+     */
+    public function agregar(Request $request)
     {
-        if (!$prenda) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Prenda no encontrada.'
-            ], 404);
+        $prenda = Prenda::findOrFail($request->prenda_id);
+        $carrito = session()->get('carrito', collect());
+
+        if (auth()->check()) {
+            // Impide que el usuario agregue su propia prenda
+            if ($prenda->user_id === auth()->id()) {
+                return response()->json(['error' => 'No puedes agregar tus propias prendas al carrito.'], 403);
+            }
+
+            Carrito::firstOrCreate([
+                'user_id' => auth()->id(),
+                'prenda_id' => $prenda->id,
+            ]);
         }
 
+        // Solo añade la prenda si no está ya en el carrito de sesión
+        if (!$carrito->contains('id', $prenda->id)) {
+            $carrito->push($prenda);
+            session(['carrito' => $carrito]);
+        }
+
+        return $request->ajax() || $request->wantsJson()
+            ? response()->json([
+                'success' => true,
+                'message' => 'Prenda añadida al carrito.',
+                'carritoCount' => $carrito->count(),
+            ])
+            : redirect()->back()->with('success', 'Prenda añadida al carrito.');
+    }
+
+    /**
+     * Quita una prenda del carrito, tanto de la sesión como de la base de datos.
+     */
+    public function quitar(Request $request, Prenda $prenda)
+    {
         $carrito = session()->get('carrito', collect());
         $nuevoCarrito = $carrito->reject(fn($item) => $item->id == $prenda->id);
         session(['carrito' => $nuevoCarrito]);
 
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
+        if (auth()->check()) {
+            Carrito::where('user_id', auth()->id())
+                ->where('prenda_id', $prenda->id)
+                ->delete();
+        }
+
+        return $request->ajax() || $request->wantsJson()
+            ? response()->json([
                 'success' => true,
                 'message' => 'Prenda eliminada del carrito.',
                 'carritoCount' => $nuevoCarrito->count(),
                 'prendaId' => $prenda->id,
-            ]);
-        }
-
-        return redirect()->back()->with('success', 'Prenda eliminada del carrito.');
+            ])
+            : redirect()->back()->with('success', 'Prenda eliminada del carrito.');
     }
 
-    // Recupera las prendas en el carrito (sesión) y muestra solo las que no están vendidas.
+    /**
+     * Muestra el contenido actual del carrito (no vendido) y su vista correspondiente.
+     */
     public function index()
     {
         $carrito = session()->get('carrito', collect());
 
-        $carrito = $carrito->filter(function ($prenda) {
-            return !$prenda->vendido;
-        });
+        // Elimina prendas vendidas
+        $carrito = $carrito->filter(fn($prenda) => !$prenda->vendido);
 
         session()->put('carrito', $carrito);
 
@@ -100,7 +105,9 @@ class CarritoController extends Controller
         return view('carrito.index', compact('carrito', 'breadcrumb'));
     }
 
-    // Obtiene y muestra las compras realizadas por el usuario autenticado.
+    /**
+     * Muestra el historial de compras del usuario autenticado.
+     */
     public function historial()
     {
         $userId = auth()->id();
@@ -119,7 +126,9 @@ class CarritoController extends Controller
         return view('carrito.historial', compact('compras', 'breadcrumb'));
     }
 
-    // Procesa la compra: marca las prendas del carrito como vendidas, guarda las compras y limpia el carrito.
+    /**
+     * Finaliza la compra: marca prendas como vendidas, registra la compra y limpia el carrito.
+     */
     public function finalizar(Request $request)
     {
         $carrito = session('carrito', collect());
@@ -140,6 +149,12 @@ class CarritoController extends Controller
                 'precio' => $prenda->precio,
                 'fecha_compra' => now(),
             ]);
+
+            if ($userId) {
+                Carrito::where('user_id', $userId)
+                    ->where('prenda_id', $prenda->id)
+                    ->delete();
+            }
         }
 
         session()->forget('carrito');
